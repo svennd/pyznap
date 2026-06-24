@@ -52,8 +52,8 @@ class SSH:
         host : {str}
             Host to connect to
         key : {str}, optional
-            Path to keyfile (the default is None, meaning the standard location
-            '~/.ssh/id_rsa' will be checked)
+            Path to keyfile (the default is None, meaning the standard locations
+            '~/.ssh/id_rsa' or '~/.ssh/id_ed25519' will be checked)
         port : {int}, optional
             Port number to connect to (the default is 22)
 
@@ -72,7 +72,21 @@ class SSH:
         self.port = port
         self.socket = '/tmp/pyznap_{:s}@{:s}:{:d}_{:s}'.format(self.user, self.host, self.port,
                       datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
-        self.key = key or os.path.expanduser('~/.ssh/id_rsa')
+        
+        if key:
+            self.key = key
+        else:
+            # Try id_rsa first, then id_ed25519
+            id_rsa = os.path.expanduser('~/.ssh/id_rsa')
+            id_ed25519 = os.path.expanduser('~/.ssh/id_ed25519')
+            
+            if os.path.isfile(id_rsa):
+                self.key = id_rsa
+            elif os.path.isfile(id_ed25519):
+                self.key = id_ed25519
+            else:
+                self.logger.error('No valid ssh key found at {} or {}...'.format(id_rsa, id_ed25519))
+                raise FileNotFoundError('No valid ssh key found at {} or {}'.format(id_rsa, id_ed25519))
 
         if not os.path.isfile(self.key):
             self.logger.error('{} is not a valid ssh key file...'.format(self.key))

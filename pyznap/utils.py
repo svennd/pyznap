@@ -11,6 +11,7 @@
 import os
 import re
 import logging
+import pathlib
 from subprocess import Popen, PIPE, TimeoutExpired, CalledProcessError
 from .process import run
 from .ssh import SSHException
@@ -18,8 +19,6 @@ from .ssh import SSHException
 from datetime import datetime
 from configparser import (ConfigParser, NoOptionError, MissingSectionHeaderError,
                           DuplicateSectionError, DuplicateOptionError)
-from pkg_resources import resource_string
-
 
 def exists(executable='', ssh=None):
     """Tests if an executable exists on the system.
@@ -171,7 +170,9 @@ def create_config(path):
     logger = logging.getLogger(__name__)
 
     CONFIG_FILE = os.path.join(path, 'pyznap.conf')
-    config = resource_string(__name__, 'config/pyznap.conf').decode("utf-8")
+    config_path = (pathlib.Path(__file__).parent.resolve() / 'config' / 'pyznap.conf').absolute()
+    with open(config_path, 'r') as file:
+        config = file.read()
 
     logger.info('Initial setup...')
 

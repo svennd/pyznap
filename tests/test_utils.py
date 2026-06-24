@@ -30,8 +30,8 @@ def open_ssh(user, host, key=None, port=22):
     host : {str}
         Host to connect to
     key : {str}, optional
-        Path to ssh keyfile (the default is None, meaning the standard location
-        '~/.ssh/id_rsa' will be checked)
+        Path to ssh keyfile (the default is None, meaning the standard locations
+        '~/.ssh/id_rsa' or '~/.ssh/id_ed25519' will be checked)
     port : {int}, optional
         Port number to connect to (the default is 22)
 
@@ -50,11 +50,22 @@ def open_ssh(user, host, key=None, port=22):
 
     logger = logging.getLogger(__name__)
 
-    if not key:
-        key = os.path.expanduser('~/.ssh/id_rsa')
-    if not os.path.isfile(key):
-        logger.error('{} is not a valid ssh key file...'.format(key))
-        raise FileNotFoundError(key)
+    if key:
+        if not os.path.isfile(key):
+            logger.error('{} is not a valid ssh key file...'.format(key))
+            raise FileNotFoundError(key)
+    else:
+        # Try id_rsa first, then id_ed25519
+        id_rsa = os.path.expanduser('~/.ssh/id_rsa')
+        id_ed25519 = os.path.expanduser('~/.ssh/id_ed25519')
+        
+        if os.path.isfile(id_rsa):
+            key = id_rsa
+        elif os.path.isfile(id_ed25519):
+            key = id_ed25519
+        else:
+            logger.error('No valid ssh key found at {} or {}...'.format(id_rsa, id_ed25519))
+            raise FileNotFoundError('No valid ssh key found at {} or {}'.format(id_rsa, id_ed25519))
 
     ssh = pm.SSHClient()
     # Append username & hostname attributes to ssh class

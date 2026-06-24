@@ -102,13 +102,13 @@ up a filesystem to a remote location looks like:
     snap = yes
     clean = yes
     dest = ssh:22:user@host:backup/data   # Specify ssh destination
-    dest_keys = /home/user/.ssh/id_rsa    # Provide key for ssh login. If none given, look in home dir
+    dest_keys = /home/user/.ssh/id_rsa    # Provide key for ssh login. If none given, look for id_rsa or id_ed25519 in home dir
     compress = gzip                       # Use gzip compression for sending over ssh
 
 To pull a filesystem from a remote location use:
 
     [ssh::user@host:rpool/data]           # Specify ssh source
-    key = /home/user/.ssh/id_rsa          # Provide key for ssh login. If none given, look in home dir
+    key = /home/user/.ssh/id_rsa          # Provide key for ssh login. If none given, look for id_rsa or id_ed25519 in home dir
     dest = tank/data
     compress = lz4
 
