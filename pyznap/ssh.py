@@ -9,10 +9,11 @@
 """
 
 import os
+import shutil
+import tempfile
 import logging
 import subprocess as sp
 import pyznap.utils
-from datetime import datetime
 from .process import run
 
 
@@ -70,8 +71,8 @@ class SSH:
         self.user = user
         self.host = host
         self.port = port
-        self.socket = '/tmp/pyznap_{:s}@{:s}:{:d}_{:s}'.format(self.user, self.host, self.port,
-                      datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
+        self.socket_dir = tempfile.mkdtemp(prefix='pyznap_ssh_')
+        self.socket = os.path.join(self.socket_dir, 'control.sock')
         
         if key:
             self.key = key
@@ -205,6 +206,11 @@ class SSH:
             run(['-O', 'exit'], timeout=5, stderr=sp.PIPE, ssh=self)
         except (sp.CalledProcessError, sp.TimeoutExpired):
             pass
+        finally:
+            socket_dir = getattr(self, 'socket_dir', None)
+            if socket_dir and os.path.isdir(socket_dir):
+                shutil.rmtree(socket_dir, ignore_errors=True)
+                self.socket_dir = None
 
 
     def __del__(self):
