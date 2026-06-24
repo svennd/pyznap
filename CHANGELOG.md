@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.7.1] - 2026-06-24
+### Fixed
+- Remove dependency on pkg_resources which is deprecated in python 3.10 @https://github.com/ruipin
+### Added
+- Also look for id_ed25519 by default for ssh connections
+
+## [1.7.0] - 2023-07-31
+### Added
+- added -L as default for large block support
+- if nothing is written to a dataset freq, and hourly snapshots are skipped.
+
 ## [1.6.0] - 2020-09-22
 ### Added
 - Added resumable send/receive.

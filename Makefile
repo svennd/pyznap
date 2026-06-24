@@ -20,6 +20,9 @@ release-test:
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 	rm -f -r build/ dist/ pyznap.egg-info/
 
+local-release:
+	python setup.py sdist bdist_wheel
+	
 clean:
 	rm -f -r build/
 	rm -f -r dist/
